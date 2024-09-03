@@ -1,5 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
+import 'package:github_starts_app/utils/constants/ui_constants.dart';
+import 'package:github_starts_app/utils/extensions/start_count_formatted_string.dart';
+import 'package:github_starts_app/view/widgets/repo_card_avatar.dart';
 import '../../models/repo_model.dart';
 import 'expandable_text.dart';
 
@@ -11,61 +14,54 @@ class GithubRepoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      elevation: 5,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(kRadius10),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(repo.ownerAvatarUrl),
-              radius: 30.0, // Slightly larger avatar for better visual appeal
-            ),
-            const SizedBox(width: 16.0),
+            RepoCard(avatarUrl: repo.ownerAvatarUrl),
+            kSizedBoxWidth15,
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    repo.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          '${repo.name}/${repo.ownerName}',
+                          style: kHeadingTextStyle.copyWith(
+                              color: kRepoDetailsColor, fontSize: 15.5),
+                        ),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Row(
+                        children: [
+                          Text(repo.stars.formattedStars,
+                              style: kBodyTextStyle.copyWith(
+                                  color: kBlack, fontWeight: FontWeight.w500)),
+                          const SizedBox(width: 5.0),
+                          const Icon(
+                            Icons.star,
+                            color: kStarColor,
+                            size: 18.0,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4.0),
+                  kSizedBoxHeight5,
                   ExpandableText(
                     text: repo.description,
                     trimLines: 2,
                   ),
                 ],
               ),
-            ),
-            const SizedBox(width: 16.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      repo.stars.toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[800],
-                      ),
-                    ),
-                    const SizedBox(width: 5.0),
-                    const Icon(
-                      Icons.star,
-                      color: Colors.orange,
-                      size: 18.0,
-                    ),
-                  ],
-                ),
-              ],
             ),
           ],
         ),
