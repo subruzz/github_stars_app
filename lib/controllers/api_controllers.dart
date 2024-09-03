@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import '../models/repo_model.dart';
@@ -14,14 +13,13 @@ class TopStarredRepositoryApiController {
           'q': 'created:>2024-07-06',
           'sort': 'stars',
           'order': 'desc',
-          'page': page.toString(),
+          'page': page,
           'per_page': '20',
         },
       );
 
       final List<dynamic> data = response.data['items'];
-      log('our item length is ${data.length}');
-      log('our name of the first item is ${data[1]['name']}');
+
       return data.map((repo) => RepoModel.fromJson(repo)).toList();
     } catch (e) {
       throw Exception('Failed to load repositories');

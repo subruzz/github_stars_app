@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:github_starts_app/view/widgets/github_repo_card.dart';
 import 'package:provider/provider.dart';
 import '../../providers/repo_provider.dart';
 
@@ -10,19 +11,43 @@ class RepoListScreen extends StatefulWidget {
 }
 
 class _RepoListScreenState extends State<RepoListScreen> {
-  int _currentPage = 1;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     _fetchRepos();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _fetchMoreRepos();
+      }
+    });
   }
 
   void _fetchRepos() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TopStarredReposProvider>(context, listen: false)
-          .fetchRepositories(_currentPage);
+          .fetchRepositories();
     });
+  }
+
+  void _fetchMoreRepos() {
+    if (!Provider.of<TopStarredReposProvider>(context, listen: false)
+            .isLoading &&
+        Provider.of<TopStarredReposProvider>(context, listen: false)
+            .hasMoreData) {
+      Provider.of<TopStarredReposProvider>(context, listen: false)
+          .fetchRepositories();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -33,30 +58,21 @@ class _RepoListScreenState extends State<RepoListScreen> {
       appBar: AppBar(
         title: const Text('Most Starred Repos'),
       ),
-      body: repoProvider.isLoading && repoProvider.repositories.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: repoProvider.repositories.length,
-              itemBuilder: (context, index) {
-                final repo = repoProvider.repositories[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(repo.ownerAvatarUrl),
-                  ),
-                  title: Text(repo.name),
-                  subtitle: Text(repo.description),
-                  trailing: Text('${repo.stars} ⭐'),
-                );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _currentPage++;
-            _fetchRepos();
-          });
+      body: ListView.builder(
+        controller: _scrollController,
+        itemCount: repoProvider.repositories.length +
+            1, // Add one more for the loading indicator
+        itemBuilder: (context, index) {
+          if (index == repoProvider.repositories.length) {
+            // Display loading indicator at the end of the list
+            return repoProvider.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : const SizedBox.shrink(); // Empty container if not loading
+          }
+
+          final repo = repoProvider.repositories[index];
+          return GithubRepoCard(repo: repo);
         },
-        child: const Icon(Icons.refresh),
       ),
     );
   }
