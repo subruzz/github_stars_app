@@ -65,7 +65,7 @@ class ExpandableTextState extends State<ExpandableText> {
           );
         } else {
           textSpan = TextSpan(
-            style: TextStyle(color: Colors.black),
+            style: const TextStyle(color: Colors.black),
             text: widget.text,
           );
         }

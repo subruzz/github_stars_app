@@ -6,8 +6,8 @@ final ThemeData appTheme = ThemeData(
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.blue.withOpacity(.8),
     elevation: 0,
-    iconTheme: IconThemeData(color: Colors.black),
-    titleTextStyle: TextStyle(
+    iconTheme: const IconThemeData(color: Colors.black),
+    titleTextStyle: const TextStyle(
       color: Colors.white,
       fontSize: 20.0,
       fontWeight: FontWeight.bold,
@@ -32,7 +32,7 @@ final ThemeData appTheme = ThemeData(
   iconTheme: const IconThemeData(
     color: Colors.black54,
   ),
-  buttonTheme: ButtonThemeData(
+  buttonTheme: const ButtonThemeData(
     buttonColor: Colors.blue, // Primary button color
     textTheme: ButtonTextTheme.primary,
   ),

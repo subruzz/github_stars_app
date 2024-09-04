@@ -1,10 +1,7 @@
 import 'dart:developer';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:github_starts_app/services/network_connectivity_service.dart';
 import 'package:github_starts_app/services/sqflite_services.dart';
-import 'package:github_starts_app/utils/constants/ui_constants.dart';
 import 'package:github_starts_app/utils/exceptions/main_exception.dart';
 import '../models/repo_model.dart';
 import '../services/top_starred_repository_api_service.dart';
@@ -17,7 +14,6 @@ class TopStarredReposProvider with ChangeNotifier {
   int _currentPage = 1;
   bool _hasMoreData = true;
   bool _isLoading = false;
-  bool _hasMoreLoading = false;
   bool _hasError = false;
 
   TopStarredReposProvider({
@@ -29,7 +25,6 @@ class TopStarredReposProvider with ChangeNotifier {
         _databaseHelper = databaseHelper;
 
   bool get hasError => _hasError;
-  bool get hasMoreLoading => _hasMoreLoading;
   List<RepoModel> get repositories => _repositories;
   bool get isLoading => _isLoading;
   bool get hasMoreData => _hasMoreData;
@@ -78,10 +73,9 @@ class TopStarredReposProvider with ChangeNotifier {
       return;
     }
 
-    _hasMoreLoading = true;
     notifyListeners();
     await fetchTopStarredGitHubRepos();
-    _hasMoreLoading = false;
+
     notifyListeners();
   }
 
@@ -106,7 +100,8 @@ class TopStarredReposProvider with ChangeNotifier {
 
       log('Error fetching repositories: $error');
     } catch (e) {
-      _hasError = true;
+      _hasError = true; // Set error flag to true if any exception occurs
+      print('Error fetching repositories: $e');
     } finally {
       log('Total repositories: ${_repositories.length}');
       notifyListeners();

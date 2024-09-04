@@ -5,7 +5,7 @@ import 'package:github_starts_app/providers/repo_provider.dart';
 import 'package:github_starts_app/services/network_connectivity_service.dart';
 import 'package:github_starts_app/services/sqflite_services.dart';
 import 'package:github_starts_app/services/top_starred_repository_api_service.dart';
-import 'package:github_starts_app/view/screens/repo_list_screen.dart';
+import 'package:github_starts_app/view/screens/splash_screen.dart';
 import 'package:github_starts_app/view/widgets/messenger.dart';
 import 'package:provider/provider.dart';
 import 'utils/theme/app_theme.dart';
@@ -40,8 +40,8 @@ class MyApp extends StatelessWidget {
         scaffoldMessengerKey: Messenger.scaffoldKey,
         theme: appTheme,
         debugShowCheckedModeBanner: false,
-        title: 'GitHub Repos',
-        home: const RepoListScreen(),
+        title: 'GitHub Star Track',
+        home: const SplashScreen(),
       ),
     );
   }

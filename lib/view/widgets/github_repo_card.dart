@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:github_starts_app/utils/constants/ui_constants.dart';
 import 'package:github_starts_app/utils/extensions/start_count_formatted_string.dart';

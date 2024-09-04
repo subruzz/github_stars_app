@@ -23,7 +23,7 @@ class ShimmerGithubRepoCard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     backgroundColor: Colors.grey,
                     radius: kRadius30,
                   ),

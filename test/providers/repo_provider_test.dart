@@ -1,145 +1,149 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:github_starts_app/providers/repo_provider.dart';
 import 'package:github_starts_app/utils/exceptions/main_exception.dart';
-import 'package:mockito/mockito.dart';
-import 'package:github_starts_app/services/network_connectivity_service.dart';
-import 'package:github_starts_app/models/repo_model.dart';
-import '../test_utils/classes/mock_classes.mocks.dart';
+import '../test_utils/classes/mock_classes.dart';
+import '../test_utils/data/test_data.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late MockTopStarredRepositoryApiService mockApiService;
   late MockDatabaseHelper mockDatabaseHelper;
-  late MockConnectivity mockConnectivity;
-  late NetworkConnectivityService networkConnectivityService;
+  late MockNetworkConnectivityService mockNetworkConnectivityService;
   late TopStarredReposProvider provider;
 
   setUp(() {
-    // Initialize the mocks
     mockApiService = MockTopStarredRepositoryApiService();
     mockDatabaseHelper = MockDatabaseHelper();
-    mockConnectivity = MockConnectivity();
+    mockNetworkConnectivityService = MockNetworkConnectivityService();
 
-    // Create the NetworkConnectivityService with the mocked Connectivity instance
-    networkConnectivityService =
-        NetworkConnectivityService(connectivity: mockConnectivity);
-
-    // Create the provider with the mocked services
     provider = TopStarredReposProvider(
-      networkConnectivityService: networkConnectivityService,
+      networkConnectivityService: mockNetworkConnectivityService,
       apiController: mockApiService,
       databaseHelper: mockDatabaseHelper,
     );
   });
 
   group('TopStarredReposProvider', () {
-    test('fetchInitialRepo should fetch repositories from API if online',
-        () async {
-      // Arrange
-      final List<RepoModel> mockRepos = [
-        const RepoModel(
-            id: 1,
-            name: 'Repo 1',
-            ownerName: 'Owner 1',
-            ownerAvatarUrl: 'https://example.com/avatar1.png',
-            stars: 10,
-            description: 'Description')
-      ];
-      when(mockConnectivity.checkConnectivity())
-          .thenAnswer((_) async => [ConnectivityResult.wifi]);
-      when(mockApiService.fetchRepositories(1))
-          .thenAnswer((_) async => mockRepos);
-
-      // Act
-      await provider.fetchInitialRepo();
-
-      // Assert
-      expect(provider.repositories, mockRepos);
+    test('Initial state should be correct', () {
+      expect(provider.repositories, []);
+      expect(provider.isLoading, false);
       expect(provider.hasError, false);
       expect(provider.hasMoreData, true);
-      verify(mockApiService.fetchRepositories(1)).called(1);
     });
 
-    test('fetchInitialRepo should load repositories from cache if offline',
-        () async {
+    test('get repos using the api', () async {
       // Arrange
-      final List<RepoModel> mockRepos = [
-        const RepoModel(
-            id: 1,
-            name: 'Repo 1',
-            ownerName: 'Owner 1',
-            ownerAvatarUrl: 'https://example.com/avatar1.png',
-            stars: 10,
-            description: 'Description')
-      ];
-      when(mockConnectivity.checkConnectivity())
-          .thenAnswer((_) async => [ConnectivityResult.none]);
-      when(mockDatabaseHelper.getCachedRepositories(20))
-          .thenAnswer((_) async => mockRepos);
+      when(() => mockNetworkConnectivityService.checkifNetworkAvailable())
+          .thenAnswer((_) async => true);
+      when(() => mockApiService.fetchRepositories(1))
+          .thenAnswer((_) async => []);
+      // Mock database caching
+      when(() => mockDatabaseHelper.cacheRepositories(any(), isClear: true))
+          .thenAnswer((_) async {});
+      // Act
+      await provider.fetchInitialRepo();
+
+      // Assert
+      verify(() => mockApiService.fetchRepositories(1)).called(1);
+    });
+
+    test('Fetch initial repo successfully', () async {
+      // Arrange
+      final repos = [TestData.repo1, TestData.repo2];
+
+      // Mock network availability
+      when(() => mockNetworkConnectivityService.checkifNetworkAvailable())
+          .thenAnswer((_) async => true);
+
+      // Mock API response
+      when(() => mockApiService.fetchRepositories(1))
+          .thenAnswer((_) async => repos);
+
+      // Mock database caching
+      when(() => mockDatabaseHelper.cacheRepositories(any(), isClear: true))
+          .thenAnswer((_) async {});
 
       // Act
       await provider.fetchInitialRepo();
 
       // Assert
-      expect(provider.repositories, mockRepos);
+      expect(provider.repositories, repos);
+      expect(provider.isLoading, false);
       expect(provider.hasError, false);
-      expect(provider.hasMoreData, false);
-      verify(mockDatabaseHelper.getCachedRepositories(20)).called(1);
+      expect(provider.hasMoreData, true);
+
+      // Verify database caching
+      verify(() => mockDatabaseHelper.cacheRepositories(repos, isClear: true))
+          .called(1);
     });
 
-    test(
-        'fetchMoreOnLoad should fetch more repositories if online and more data is available',
-        () async {
+    test('Fetch initial repo offline', () async {
       // Arrange
-      final List<RepoModel> initialRepos = [
-        const RepoModel(
-            id: 1,
-            name: 'Repo 1',
-            ownerName: 'Owner 1',
-            ownerAvatarUrl: 'https://example.com/avatar1.png',
-            stars: 10,
-            description: 'Description')
-      ];
-      final List<RepoModel> moreRepos = [
-        const RepoModel(
-            id: 2,
-            name: 'Repo 2',
-            ownerName: 'Owner 2',
-            ownerAvatarUrl: 'https://example.com/avatar2.png',
-            stars: 20,
-            description: 'Description')
-      ];
-      when(mockConnectivity.checkConnectivity())
-          .thenAnswer((_) async => [ConnectivityResult.wifi]);
-      when(mockApiService.fetchRepositories(2))
-          .thenAnswer((_) async => moreRepos);
+      when(() => mockNetworkConnectivityService.checkifNetworkAvailable())
+          .thenAnswer((_) async => false);
+      final repos = [TestData.repo1, TestData.repo2];
+      when(() => mockDatabaseHelper.getCachedRepositories(any()))
+          .thenAnswer((_) async => repos);
 
-      // Initialize provider state
-      provider.repositories.addAll(initialRepos);
-      await provider.fetchInitialRepo(); // Populate initial data
+      // Act
+      await provider.fetchInitialRepo();
+
+      // Assert
+      expect(provider.repositories, repos);
+      expect(provider.isLoading, false);
+      expect(provider.hasError, false);
+      expect(provider.hasMoreData, false);
+    });
+
+    test('Fetch repo handles error', () async {
+      // Arrange
+      when(() => mockApiService.fetchRepositories(any()))
+          .thenThrow(MainException('Error'));
+
+      // Act
+      await provider.fetchTopStarredGitHubRepos();
+
+      // Assert
+      expect(provider.hasError, true);
+      expect(provider.isLoading, false);
+      expect(provider.hasMoreData, false);
+    });
+
+    test('Fetch more data successfully', () async {
+      // Arrange
+      final repos = [TestData.repo1, TestData.repo2];
+      when(() => mockNetworkConnectivityService.checkifNetworkAvailable())
+          .thenAnswer((_) async => true);
+      when(() => mockApiService.fetchRepositories(any()))
+          .thenAnswer((_) async => repos);
+      when(() => mockDatabaseHelper.cacheRepositories(any(), isClear: false))
+          .thenAnswer((_) async {});
 
       // Act
       await provider.fetchMoreOnLoad();
 
       // Assert
-      expect(provider.repositories.length,
-          2); // Assumes initialRepos and moreRepos are appended
-      expect(provider.hasMoreData, true);
-      verify(mockApiService.fetchRepositories(2)).called(1);
+      expect(provider.repositories, repos); // Check if repositories are updated
+      expect(provider.isLoading, false);
+      expect(provider.hasError, false);
+      expect(provider.hasMoreData, true); // Ensure hasMoreData is set correctly
     });
 
-    test('fetchTopStarredGitHubRepos should handle API errors correctly',
-        () async {
+    test('Fetch more data handles error', () async {
       // Arrange
-      when(mockApiService.fetchRepositories(1))
-          .thenThrow(MainException('API error'));
+      when(() => mockNetworkConnectivityService.checkifNetworkAvailable())
+          .thenAnswer((_) async => true);
+      when(() => mockApiService.fetchRepositories(any()))
+          .thenThrow(MainException('Error'));
 
       // Act
-      await provider.fetchTopStarredGitHubRepos(isFirst: true);
+      await provider.fetchMoreOnLoad();
 
       // Assert
       expect(provider.hasError, true);
-      expect(provider.hasMoreData, false);
+      expect(provider.isLoading, false);
+      expect(provider.hasMoreData, false); // Ensure hasMoreData is updated
     });
   });
 }
