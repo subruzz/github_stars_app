@@ -6,7 +6,7 @@ class RepoModel {
   final int stars;
   final String description;
 
-  RepoModel({
+  const RepoModel({
     required this.id,
     required this.name,
     required this.ownerName,

@@ -1,14 +1,21 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:github_starts_app/utils/exceptions/main_exception.dart';
+
 import 'package:github_starts_app/utils/extensions/formatted_time.dart';
+
 import '../models/repo_model.dart';
 
 /// Controller class responsible for interacting with the GitHub API
 /// to fetch the top-starred repositories created in the last 30 days.
 class TopStarredRepositoryApiService {
+  final Dio dio;
+  TopStarredRepositoryApiService({
+    required this.dio,
+  });
   // Dio instance for making HTTP requests
-  final Dio _dio = Dio();
 
   /// Fetches a list of repositories created in the last 30 days,
   /// sorted by stars in descending order.
@@ -24,7 +31,7 @@ class TopStarredRepositoryApiService {
       final String formattedDate = thirtyDaysAgo.toFormattedString();
       log('current date is $formattedDate');
       // Make the GET request to GitHub API
-      final response = await _dio.get(
+      final response = await dio.get(
         'https://api.github.com/search/repositories',
         queryParameters: {
           'q':
@@ -36,14 +43,18 @@ class TopStarredRepositoryApiService {
         },
       );
 
-      // Extract repository items from the response data
-      final List<dynamic> data = response.data['items'];
+      if (response.statusCode == 200) {
+        // Extract repository items from the response data
+        final List<dynamic> data = response.data['items'];
 
-      // Map the response data to a list of RepoModel
-      return data.map((repo) => RepoModel.fromJson(repo)).toList();
+        // Map the response data to a list of RepoModel
+        return data.map((repo) => RepoModel.fromJson(repo)).toList();
+      } else {
+        throw MainException('Failed to load repositories');
+      }
     } catch (e) {
-      // Throw an exception if the API call fails
-      throw Exception('Failed to load repositories');
+      // Throw an MainException  if the API call fails
+      throw MainException('Failed to load repositories');
     }
   }
 }

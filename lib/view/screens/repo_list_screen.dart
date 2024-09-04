@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:github_starts_app/utils/constants/ui_constants.dart';
 import 'package:github_starts_app/view/widgets/github_repo_card.dart';
 import 'package:github_starts_app/view/widgets/shimmer_github_repo_card.dart';
+import 'package:github_starts_app/view/widgets/star.dart';
 import 'package:provider/provider.dart';
 import '../../providers/repo_provider.dart';
 
@@ -54,28 +56,35 @@ class _RepoListScreenState extends State<RepoListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GitHubStarTrack'),
+        title: const Row(
+          children: [Text('GitHubStarTrack'), kSizedBoxWidth15, Star()],
+        ),
       ),
       body: RefreshIndicator(onRefresh: () async {
         _fetchRepos();
       }, child: Consumer<TopStarredReposProvider>(
         builder: (context, value, child) {
-          return repoProvider.isLoading
-              ? const ShimmerGithubRepoCard()
-              : ListView.builder(
-                  controller: _scrollController,
-                  itemCount: repoProvider.repositories.length +
-                      (repoProvider.hasMoreData ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == repoProvider.repositories.length) {
-                      // Display loading indicator at the end of the list
-                      return const Center(child: CircularProgressIndicator());
-                    }
+          return repoProvider.hasError
+              ? const Center(
+                  child: Text('Something went wrong,please try again!'),
+                )
+              : repoProvider.isLoading
+                  ? const ShimmerGithubRepoCard()
+                  : ListView.builder(
+                      controller: _scrollController,
+                      itemCount: repoProvider.repositories.length +
+                          (repoProvider.hasMoreData ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == repoProvider.repositories.length) {
+                          // Display loading indicator at the end of the list
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
 
-                    final repo = repoProvider.repositories[index];
-                    return GithubRepoCard(repo: repo);
-                  },
-                );
+                        final repo = repoProvider.repositories[index];
+                        return GithubRepoCard(repo: repo);
+                      },
+                    );
         },
       )),
     );
