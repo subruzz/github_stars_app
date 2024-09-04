@@ -1,16 +1,37 @@
-# github_starts_app
+# GitHub Repos App
 
-A new Flutter project.
+## Overview
 
-## Getting Started
+The GitHub Repos App is a Flutter application that lists the most starred GitHub repositories created in the last 30 days. 
+The app fetches data from the GitHub API and stores it locally using `sqflite` for offline access.
+It supports pagination and displays relevant repository details, including the repository name, description, number of stars, and the owner's username and avatar.
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- **List Most Starred Repositories**: Displays repositories with the most stars, created in the last 30 days.
+- **Offline Access**: Uses `sqflite` to cache data locally, allowing users to view previously fetched repositories even without an internet connection.
+- **Pagination**: Handles paginated results from the GitHub API.
+- **Repository Details**: Shows repository name, description, star count, owner's username, and avatar.
+- **Unit Testing**: Includes unit tests for models, services, and providers.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Technologies Used
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter
+- Provider
+- SQFlite
+- Dio
+
+## Setup Instructions
+
+### Prerequisites
+
+Ensure you have the following installed:
+- [Flutter](https://flutter.dev/docs/get-started/install)
+- [Dart](https://dart.dev/get-dart)
+- An IDE like [VS Code](https://code.visualstudio.com/) or [Android Studio](https://developer.android.com/studio)
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/your-username/github_repos_app.git
+cd github_repos_app
