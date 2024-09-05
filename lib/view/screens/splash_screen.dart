@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:github_starts_app/view/screens/repo_list_screen.dart';
+import 'package:github_starts_app/view/screens/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     Timer(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const RepoListScreen(),
+        builder: (context) => const HomeScreen(),
       ));
     });
   }

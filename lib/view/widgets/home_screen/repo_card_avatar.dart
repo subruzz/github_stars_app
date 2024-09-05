@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:github_starts_app/view/widgets/shimmer_avatar.dart';
+import 'package:github_starts_app/view/widgets/home_screen/shimmer_avatar.dart';
 
-import '../../utils/constants/ui_constants.dart';
+import '../../../utils/constants/ui_constants.dart';
 
 class RepoCard extends StatelessWidget {
   final String avatarUrl;
@@ -18,14 +18,14 @@ class RepoCard extends StatelessWidget {
         height: kRadius30 * 2,
         fit: BoxFit.cover,
         placeholder: (context, url) => const CircleAvatar(
-          backgroundColor: Colors.white,
+          backgroundColor: kGreyColor,
           radius: kRadius30,
           child: ShimmerPlaceholder(radius: kRadius30),
         ),
         errorWidget: (context, url, error) => const CircleAvatar(
           radius: kRadius30,
-          backgroundColor: Colors.white,
-          child: Icon(Icons.error),
+          backgroundColor: kGreyColor,
+          child: Icon(Icons.error, color: kBlack),
         ),
       ),
     );

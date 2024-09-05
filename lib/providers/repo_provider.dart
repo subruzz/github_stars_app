@@ -81,10 +81,9 @@ class TopStarredReposProvider with ChangeNotifier {
       return;
     } else if (_currentPage == 1) {
       _hasMoreData = true;
-      fetchInitialRepo();
-    } else {
-      await fetchTopStarredGitHubRepos();
+      return fetchInitialRepo();
     }
+    await fetchTopStarredGitHubRepos();
   }
 
   // Main API call to fetch repositories
@@ -107,7 +106,7 @@ class TopStarredReposProvider with ChangeNotifier {
       // Cache repositories if required
       await _databaseHelper.cacheRepositories(repos, isClear: isFirst);
     } on MainException catch (error) {
-      _setError('${error.message}, Please try refreshing!');
+      _setError('${error.message}, Please try rereshing');
       _hasMoreData = false;
       log('MainException: $error');
     } catch (e) {

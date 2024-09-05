@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
-  primarySwatch: Colors.blue, // Customize your primary color
-  scaffoldBackgroundColor: Colors.white, // Overall background color
+  primarySwatch: Colors.blue, 
+  scaffoldBackgroundColor: Colors.white,
   appBarTheme: AppBarTheme(
     backgroundColor: Colors.blue.withOpacity(.8),
     elevation: 0,
@@ -28,16 +28,5 @@ final ThemeData appTheme = ThemeData(
     ),
     elevation: 4.0,
     color: Colors.white, // Card background color
-  ),
-  iconTheme: const IconThemeData(
-    color: Colors.black54,
-  ),
-  buttonTheme: const ButtonThemeData(
-    buttonColor: Colors.blue, // Primary button color
-    textTheme: ButtonTextTheme.primary,
-  ),
-  floatingActionButtonTheme: const FloatingActionButtonThemeData(
-    backgroundColor: Colors.blue,
-    foregroundColor: Colors.white,
   ),
 );

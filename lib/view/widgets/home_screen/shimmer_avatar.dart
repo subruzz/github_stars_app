@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../utils/constants/ui_constants.dart';
 
 class ShimmerPlaceholder extends StatelessWidget {
   final double radius;
@@ -9,12 +10,12 @@ class ShimmerPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
+      baseColor: kShimmerBaseColor,
+      highlightColor: kShimmerHighlightColor,
       child: CircleAvatar(
         radius: radius,
         backgroundColor: Colors.white,
-        child: Icon(Icons.image, color: Colors.grey[400], size: radius),
+        child: Icon(Icons.image, color: kShimmerIconColor, size: radius),
       ),
     );
   }

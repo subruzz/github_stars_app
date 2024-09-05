@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:github_starts_app/utils/constants/ui_constants.dart';
 import 'package:github_starts_app/utils/extensions/start_count_formatted_string.dart';
-import 'package:github_starts_app/view/widgets/repo_card_avatar.dart';
-import '../../models/repo_model.dart';
-import 'expandable_text.dart';
+import 'package:github_starts_app/view/widgets/home_screen/repo_card_avatar.dart';
+import '../../../models/repo_model.dart';
+import '../common/expandable_text.dart';
 
 class GithubRepoCard extends StatelessWidget {
   final RepoModel repo;

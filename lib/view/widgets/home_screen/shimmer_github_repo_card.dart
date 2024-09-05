@@ -11,20 +11,20 @@ class ShimmerGithubRepoCard extends StatelessWidget {
       itemCount: 8,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
+          baseColor: kShimmerBaseColor,
+          highlightColor: kShimmerHighlightColor,
           child: Card(
             elevation: 5,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(kRadius10),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(kSpacing16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const CircleAvatar(
-                    backgroundColor: Colors.grey,
+                    backgroundColor: kGreyColor,
                     radius: kRadius30,
                   ),
                   kSizedBoxWidth15,
@@ -37,23 +37,25 @@ class ShimmerGithubRepoCard extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Container(
-                                height: 16.0,
-                                color: Colors.grey,
+                                height:
+                                    kFontSize18, // Adjust height based on font size
+                                color: kGreyColor,
                               ),
                             ),
-                            const SizedBox(width: 8.0),
+                            kSizedBoxHeight10,
                             Row(
                               children: [
                                 Container(
-                                  width: 50.0,
-                                  height: 16.0,
-                                  color: Colors.grey,
+                                  width: kFontSize18 *
+                                      2.5, // Adjust width based on font size
+                                  height: kFontSize18,
+                                  color: kGreyColor,
                                 ),
-                                const SizedBox(width: 5.0),
+                                kSizedBoxWidth5,
                                 const Icon(
                                   Icons.star,
-                                  color: Colors.grey,
-                                  size: 18.0,
+                                  color: kStarColor, // Use star color
+                                  size: kFontSize18,
                                 ),
                               ],
                             ),
@@ -61,8 +63,9 @@ class ShimmerGithubRepoCard extends StatelessWidget {
                         ),
                         kSizedBoxHeight5,
                         Container(
-                          height: 60.0,
-                          color: Colors.grey,
+                          height: kFontSize18 *
+                              3.5, // Adjust height based on font size
+                          color: kGreyColor,
                         ),
                       ],
                     ),
