@@ -20,6 +20,8 @@ It supports pagination and displays relevant repository details, including the r
 - Provider
 - sqflite
 - Dio
+- 
+Check out the live version of the app here: [Live GitHub Repos App](https://www.amazon.com/gp/product/B0DG3JM5FK)
 
 ## Setup Instructions
 
@@ -37,4 +39,3 @@ git clone https://github.com/your-username/github_repos_app.git
 cd github_repos_app
 ## Live Demo
 
-Check out the live version of the app here: [Live GitHub Repos App](https://www.amazon.com/gp/product/B0DG3JM5FK)
