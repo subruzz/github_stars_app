@@ -11,10 +11,11 @@ class TopStarredReposProvider with ChangeNotifier {
   final DatabaseHelper _databaseHelper;
   final List<RepoModel> _repositories = [];
   final NetworkConnectivityService _networkConnectivityService;
+
   int _currentPage = 1;
   bool _hasMoreData = true;
   bool _isLoading = false;
-  bool _hasError = false;
+  String? _hasError;
 
   TopStarredReposProvider({
     required NetworkConnectivityService networkConnectivityService,
@@ -24,63 +25,73 @@ class TopStarredReposProvider with ChangeNotifier {
         _networkConnectivityService = networkConnectivityService,
         _databaseHelper = databaseHelper;
 
-  bool get hasError => _hasError;
+  // Getters for the provider's state
+  String? get hasError => _hasError;
   List<RepoModel> get repositories => _repositories;
   bool get isLoading => _isLoading;
   bool get hasMoreData => _hasMoreData;
 
+  // Set the loading state and notify listeners
+  void _setLoadingState(bool isLoading) {
+    _isLoading = isLoading;
+    notifyListeners();
+  }
+
+  // Set the error message
+  void _setError(String? error) {
+    _hasError = error;
+    notifyListeners();
+  }
+
+  // Fetch initial repositories (first page)
   Future<void> fetchInitialRepo() async {
-    _changeLoadingState(true);
+    _setError(null); // Reset error state
+    _setLoadingState(true);
 
     // Check network connectivity
     bool isConnected =
         await _networkConnectivityService.checkifNetworkAvailable();
-    log('we have connection: $isConnected');
+    log('Network connection status: $isConnected');
 
     if (!isConnected) {
-      // Offline scenario
-      // Messenger.showSnackBar(
-      //   message: 'You are offline. Showing cached repositories.',
-      //   color: kWarning,
-      // );
-
-      // Get cached repositories
+      // Offline: Load from cache
+      _setError('You are offline. Showing cached repositories.');
       final repos = await _databaseHelper.getCachedRepositories(20);
-      _repositories.clear(); // Ensure previous data is cleared
+      _repositories.clear(); // Clear old data
       _repositories.addAll(repos);
-      log('Loaded ${repos.length} repositories from cache');
-
-      // No more data available from cache
       _hasMoreData = false;
+      log('Loaded ${repos.length} repositories from cache');
     } else {
-      // Online scenario
-      // Clear current repositories and fetch new data
+      // Online: Fetch fresh data
       _currentPage = 1;
       _repositories.clear();
       await fetchTopStarredGitHubRepos(isFirst: true);
     }
 
-    _changeLoadingState(false);
+    _setLoadingState(false);
   }
 
+  // Fetch more repositories on scroll
   Future<void> fetchMoreOnLoad() async {
     if (_isLoading || !_hasMoreData) return;
 
     if (!await _networkConnectivityService.checkifNetworkAvailable()) {
       _hasMoreData = false;
-
-      notifyListeners();
+      _setError('You are offline. No more repositories available.');
       return;
+    } else if (_currentPage == 1) {
+      _hasMoreData = true;
+      fetchInitialRepo();
+    } else {
+      await fetchTopStarredGitHubRepos();
     }
-
-    notifyListeners();
-    await fetchTopStarredGitHubRepos();
-
-    notifyListeners();
   }
 
+  // Main API call to fetch repositories
   Future<void> fetchTopStarredGitHubRepos(
       {int? page, bool isFirst = false}) async {
+    _setError(null); // Reset error state before each fetch
+
     try {
       final int pageToFetch = page ?? _currentPage;
       final repos = await _apiController.fetchRepositories(pageToFetch);
@@ -93,23 +104,18 @@ class TopStarredReposProvider with ChangeNotifier {
         _hasMoreData = true;
       }
 
+      // Cache repositories if required
       await _databaseHelper.cacheRepositories(repos, isClear: isFirst);
     } on MainException catch (error) {
-      _hasError = true;
+      _setError('${error.message}, Please try refreshing!');
       _hasMoreData = false;
-
-      log('Error fetching repositories: $error');
+      log('MainException: $error');
     } catch (e) {
-      _hasError = true; // Set error flag to true if any exception occurs
-      print('Error fetching repositories: $e');
+      _setError('An unexpected error occurred.');
+      log('Error: $e');
     } finally {
       log('Total repositories: ${_repositories.length}');
       notifyListeners();
     }
-  }
-
-  void _changeLoadingState(bool isLoading) {
-    _isLoading = isLoading;
-    notifyListeners();
   }
 }

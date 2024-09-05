@@ -44,6 +44,7 @@ class TopStarredRepositoryApiService {
       );
 
       if (response.statusCode == 200) {
+        throw MainException('Failed to load repositories');
         // Extract repository items from the response data
         final List<dynamic> data = response.data['items'];
 

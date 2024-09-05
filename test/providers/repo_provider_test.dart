@@ -28,7 +28,7 @@ void main() {
     test('Initial state should be correct', () {
       expect(provider.repositories, []);
       expect(provider.isLoading, false);
-      expect(provider.hasError, false);
+      expect(provider.hasError, null);
       expect(provider.hasMoreData, true);
     });
 
@@ -70,7 +70,7 @@ void main() {
       // Assert
       expect(provider.repositories, repos);
       expect(provider.isLoading, false);
-      expect(provider.hasError, false);
+      expect(provider.hasError, null);
       expect(provider.hasMoreData, true);
 
       // Verify database caching
@@ -92,7 +92,7 @@ void main() {
       // Assert
       expect(provider.repositories, repos);
       expect(provider.isLoading, false);
-      expect(provider.hasError, false);
+      expect(provider.hasError, isNotNull);
       expect(provider.hasMoreData, false);
     });
 
@@ -105,7 +105,7 @@ void main() {
       await provider.fetchTopStarredGitHubRepos();
 
       // Assert
-      expect(provider.hasError, true);
+      expect(provider.hasError, isNotNull);
       expect(provider.isLoading, false);
       expect(provider.hasMoreData, false);
     });
@@ -124,10 +124,10 @@ void main() {
       await provider.fetchMoreOnLoad();
 
       // Assert
-      expect(provider.repositories, repos); // Check if repositories are updated
+      expect(provider.repositories, repos);
       expect(provider.isLoading, false);
-      expect(provider.hasError, false);
-      expect(provider.hasMoreData, true); // Ensure hasMoreData is set correctly
+      expect(provider.hasError, null);
+      expect(provider.hasMoreData, true);
     });
 
     test('Fetch more data handles error', () async {
@@ -141,9 +141,9 @@ void main() {
       await provider.fetchMoreOnLoad();
 
       // Assert
-      expect(provider.hasError, true);
+      expect(provider.hasError, isNotNull);
       expect(provider.isLoading, false);
-      expect(provider.hasMoreData, false); // Ensure hasMoreData is updated
+      expect(provider.hasMoreData, false);
     });
   });
 }
